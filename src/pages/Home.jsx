@@ -13,21 +13,28 @@ import StarIcon from '@mui/icons-material/Star';
 import { Button } from '@mui/material';
 import { IconButton } from '@mui/material';
 import { ShoppingCartSharp } from '@mui/icons-material';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../feature/cart-slice';
+import { useTheme } from '@emotion/react';
+import { useSelector } from 'react-redux';
+import { fetchAllProducts } from '../feature/products-slice';
+import { useSearchParams } from 'react-router-dom';
 
 export default function Home() {
-    const [products, setProducts] = useState([]);
+    const [searchParams] = useSearchParams();
+    const category = searchParams.get("category");
+    const theme = useTheme();
+    // const [products, setProducts] = useState([]);
+    const state = useSelector(state => state.products);
+    const { value: products, loading } = state ?? {};
+    const [expanded, setExpanded] = React.useState(false);
+    const dispatch = useDispatch();
+    const searchTerm = searchParams.get("searchterm");
 
-    async function fetchAllProducts() {
-        const response = await fetch('https://fakestoreapi.com/products')
-            .then(res => res.json())
-            .then(json => {
-                console.log(json);
-                setProducts(json);
-            })
-    }
-    useEffect(() => {
-        fetchAllProducts();
-    }, [])
+
+    // useEffect(() => {
+    //     fetchAllProducts();
+    // }, [])
 
 
     // return <div>
@@ -35,16 +42,28 @@ export default function Home() {
     //         {JSON.stringify(products, null, 2)}
     //     </pre>
     // </div>
-    const [expanded, setExpanded] = React.useState(false);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
 
-    return <Container sx={{ py: 8 }} maxWidth="lg">
+    if (!products?.length) {
+        dispatch(fetchAllProducts());
+    }
+
+    function addProductToCart(product) {
+        //dispatch an action
+        dispatch(addToCart({ product, quantity: 1 }));
+    }
+
+    let filteredProducts = category && (category !== "all") ? products.filter(prod => prod.category === category) : products;
+    filteredProducts = searchTerm ? filteredProducts.filter(prod => prod.title.toLowerCase().includes(searchTerm.toLowerCase())) : filteredProducts;
+
+    return < Container sx={{ py: 8 }
+    } maxWidth="lg" >
         <Grid container spacing={2} sx={{ alignContent: "space-evenly", justifyContent: "center" }}>
             {/* <h1>{products.category}</h1> */}
-            {products.map(({ title, id, image, price, rating, description }) => (
+            {filteredProducts?.map(({ title, id, image, price, rating, description }) => (
                 <Grid item key={id} xs={12} sm={6} md={3} sx={{ margin: "10px" }}>
                     <Card sx={{ height: "100%", display: "flex", flexDirection: "column", backgroundColor: "white", padding: "10px" }}>
                         <CardMedia component="img"
@@ -78,7 +97,7 @@ export default function Home() {
                                         sx={{ color: "black" }}>
                                         <ExpandMoreIcon />
                                     </ExpandMore>
-                                    <IconButton sx={{ fontSize: "12px", borderRadius: "4px" }}>
+                                    <IconButton sx={{ fontSize: "12px", borderRadius: "4px" }} onClick={() => addProductToCart({ title, id, image, price, rating, description })}>
                                         <ShoppingCartSharp title="Add to cart" sx={{ color: "green" }} />
                                         <Typography sx={{ color: "green", fontSize: "12px" }}>Add to cart</Typography>
                                     </IconButton>
@@ -100,6 +119,6 @@ export default function Home() {
                 </Grid>
             ))}
         </Grid>
-    </Container>
+    </Container >
 }
 

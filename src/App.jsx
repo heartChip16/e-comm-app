@@ -9,6 +9,8 @@ import Layout from './components/Layout';
 import Cart from './pages/Cart';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import { Provider } from 'react-redux';
+import { store } from './store';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -28,12 +30,9 @@ function App() {
 
   return (
     <div className="App">
-      {/* <Button variant="contained">Press Me!</Button>
-      <br />
-      <br />
-      <Button variant="outlined">Press Me!</Button> */}
-      <RouterProvider router={router} />
-
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>
     </div>
   )
 }

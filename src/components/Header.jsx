@@ -21,6 +21,9 @@ import { useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import { useTheme } from '@emotion/react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../firebase/Auth';
+import { Menu } from '@mui/material';
 
 
 const Search = styled("section")(({ theme }) => ({
@@ -47,6 +50,8 @@ const StyledAutocomplete = styled(Autocomplete)(({ theme }) => ({
     },
     "& .MuiOutlinedInput-notchedOutline": {
         border: "none",
+    }, "& .MuiOutlinedInput-root": {
+        padding: "0",
     }
 }));
 
@@ -59,6 +64,11 @@ const SearchIconWrapper = styled("section")(({ theme }) => ({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+}));
+
+const StyledLink = styled(Link)(({ theme }) => ({
+    color: theme.palette.common.white,
+    textDecoration: "none",
 }));
 
 function SearchBar() {
@@ -105,7 +115,8 @@ function SearchBar() {
             onChange={handleCategoryChange}
             size="small"
             sx={{
-                m: 1,
+                mx: 1,
+                py: 0,
                 "&": {
                     "::before": {
                         ":hover": {
@@ -122,7 +133,7 @@ function SearchBar() {
                     ".MuiInput-underline:hover": {
                         border: "none",
                         color: "white",
-                    },
+                    }
                 },
 
                 textTransform: "capitalize"
@@ -135,7 +146,7 @@ function SearchBar() {
                     return str.charAt(0).toUpperCase() + str.slice(1);
                 } */}
                 {/* return <MenuItem key={category} value={capitalize(category)}>{capitalize(category)}</MenuItem> */ }
-                return <MenuItem key={category} value={category} sx={{ textTransform: "capitalize" }}>{category}</MenuItem>
+                return <MenuItem key={category} value={category} sx={{ textTransform: "capitalize", padding: "0" }}>{category}</MenuItem>
 
             })}
         </Select>
@@ -167,25 +178,79 @@ function SearchBar() {
 
 
 export default function Header() {
+    const { user, signOutUser, signIn } = useAuth();
     const cartItems = useSelector(state => state.cart?.value);
     const count = getItemCount(cartItems);
+    const navigate = useNavigate();
+    const [anchorEl, setAnchorEl] = useState(null);
+    const isMenuOpen = Boolean(anchorEl);
 
-    return <AppBar position="sticky">
-        <Toolbar sx={{ background: "green", justifyContent: "space-between", display: "flex" }}>
-            <Typography variant="h6" color="inherit" noWrap sx={{ marginRight: "30px", flexGrow: "2", overflow: "visible", }}>Ingrid E-com Store</Typography>
-            {/* <Box sx={{ display: { xs: "none", md: "flex" } }}> */}
-            <SearchBar sx={{ flexGrow: 1 }} />
-            <Box sx={{ display: "flex" }}>
-                <Box>
-                    <IconButton size="large" aria-label="shows cart items count" color="inherit" >
-                        {/* <Badge badgeContent={1} color="primary"> */}
-                        <Badge badgeContent={count} color="info">
-                            <ShoppingCartSharp ></ShoppingCartSharp>
-                        </Badge>
-                    </IconButton>
+    function navigateToCart() {
+        navigate("/cart");
+    }
+
+    function handleProfileMenuOpen(e) {
+        setAnchorEl(e.currentTarget);
+    }
+
+    function handleMenuClose() {
+        setAnchorEl(null);
+    }
+    async function logout() {
+        await signOutUser();
+        navigate("/login");
+    }
+
+    function login() {
+        navigate("/login");
+    }
+
+    const renderMenu = (
+        <Menu anchorEl={anchorEl} id="user-profile-menu" keepMounted transformOrigin={{
+            horizontal: "right", vertical: "top",
+        }} anchorOrigin={{
+            horizontal: "right", vertical: "bottom",
+        }}
+            open={isMenuOpen}
+            onClose={handleMenuClose}
+        >
+            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+            <MenuItem onClick={handleMenuClose}>My Account</MenuItem>
+            <MenuItem onClick={logout}>Logout</MenuItem>
+        </Menu>
+    )
+
+    return <>
+        <AppBar position="sticky" sx={{
+            backgroundColor: "green",
+        }}>
+            <Toolbar sx={{ background: "green", justifyContent: "space-between", display: "flex" }}>
+                <Typography variant="h6" color="inherit" noWrap sx={{ marginRight: "30px", flexGrow: "2", overflow: "visible", }}>
+                    <StyledLink to="/">
+                        Ingrid's Store
+                    </StyledLink>
+                </Typography>
+                {/* <Box sx={{ display: { xs: "none", md: "flex" } }}> */}
+                <SearchBar sx={{ flexGrow: 1, }} />
+                <Box sx={{ display: "flex" }}>
+                    <Box sx={{
+                        display: "flex"
+                    }}>
+                        <IconButton onClick={navigateToCart} size="large" aria-label="shows cart items count" color="inherit" >
+                            {/* <Badge badgeContent={1} color="primary"> */}
+                            <Badge badgeContent={count} color="info">
+                                <ShoppingCartSharp ></ShoppingCartSharp>
+                            </Badge>
+                        </IconButton>
+                        {user ?
+                            <Button onClick={handleProfileMenuOpen} sx={{ color: "white", textTransform: "lowercase" }}>{user?.displayName ?? user.email}</Button>
+                            : <Button color="inherit" onClick={login}>Login</Button>
+                        }
+                    </Box>
                 </Box>
-                <Button color="inherit" >Login</Button>
-            </Box>
-        </Toolbar>
-    </AppBar>;
+            </Toolbar>
+        </AppBar>
+        {renderMenu}
+    </>
+
 }

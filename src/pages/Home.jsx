@@ -53,7 +53,13 @@ export default function Home() {
 
     function addProductToCart(product) {
         //dispatch an action
-        dispatch(addToCart({ product, quantity: 1 }));
+        let quantity = 1;
+
+        // const prodInCart = cart.filter(({ prod, quantity }) => { cart.product.title === prod.title });
+        // if (prodInCart) {
+        //     quantity = prodInCart.quantity + 1;
+        // }
+        dispatch(addToCart({ product, quantity }));
     }
 
     let filteredProducts = category && (category !== "all") ? products.filter(prod => prod.category === category) : products;

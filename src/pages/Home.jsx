@@ -103,9 +103,9 @@ export default function Home() {
                                         sx={{ color: "black" }}>
                                         <ExpandMoreIcon />
                                     </ExpandMore>
-                                    <IconButton sx={{ fontSize: "12px", borderRadius: "4px" }} onClick={() => addProductToCart({ title, id, image, price, rating, description })}>
-                                        <ShoppingCartSharp title="Add to cart" sx={{ color: "green" }} />
-                                        <Typography sx={{ color: "green", fontSize: "12px" }}>Add to cart</Typography>
+                                    <IconButton color="success" sx={{ fontSize: "12px", borderRadius: "4px", color: "white", backgroundColor: "green" }} onClick={() => addProductToCart({ title, id, image, price, rating, description })}>
+                                        <ShoppingCartSharp title="Add to cart" sx={{ color: "white" }} />
+                                        <Typography sx={{ fontSize: "12px" }} color="success" variant='contained'>Add to cart</Typography>
                                     </IconButton>
                                 </CardActions>
                             </CardContent>

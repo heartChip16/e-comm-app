@@ -53,6 +53,11 @@ export default function Login() {
                     Sign In
                 </Button>
             </form>
+            <Grid container justifyContent={'flex-end'} color="success" sx={{ mt: 2 }}>
+                <Grid item>
+                    <Link href="/register" sx={{ color: "green", textDecorationColor: "green" }} variant="body2">New user? Sign up</Link>
+                </Grid>
+            </Grid>
         </Box>
     </Container>
 }

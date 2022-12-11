@@ -238,7 +238,7 @@ export default function Header() {
                     }}>
                         <IconButton onClick={navigateToCart} size="large" aria-label="shows cart items count" color="inherit" >
                             {/* <Badge badgeContent={1} color="primary"> */}
-                            <Badge badgeContent={count} color="info">
+                            <Badge badgeContent={count} sx={{ ".css-fvc8ir-MuiBadge-badge": { backgroundColor: "white", color: "green" } }}>
                                 <ShoppingCartSharp ></ShoppingCartSharp>
                             </Badge>
                         </IconButton>
